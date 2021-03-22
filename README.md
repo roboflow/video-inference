@@ -4,6 +4,13 @@ Example script to do inference on a video file with
 
 ![Example Output](fish.gif)
 
+An example video (gif) generated with this utility script from a Roboflow model
+with the following command:
+
+```
+ROBOFLOW_KEY=xxxxxxxx ./infer.sh rf-aquarium-merged--3 IMG_3203.mov fish.gif --fps_in 3 --fps_out 12 --scale 4
+```
+
 ## Installation
 
 The shell script you need is [`infer.sh`](infer.sh) in this repo.
@@ -75,7 +82,7 @@ The [`infer.sh`](infer.sh) script accepts the following parameters:
 | `--parallel`    | `--parallel 8`                   | The number of concurrent frames to send to the model (default: `8`).
 | model           | `xx-mymodel--1`                  | The Roboflow model to use for inference (required).
 | video_in        | `video_in.mp4`                   | The input video file (required).
-| video_out       | `video_out.mp4`                  | The output video file (required).
+| video_out       | `video_out.mp4`                  | The output video file (required). Can be of any format supported by `ffmpeg`'s encoder (eg `.mov`, `.mp4`, `.gif`).
 
 ## Building
 
