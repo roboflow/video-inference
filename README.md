@@ -14,7 +14,7 @@ To use it
 
 ```
 # Simple usage with ROBOFLOW_KEY env var set inline
-ROBOFLOW_KEY=xxxxx ./infer.sh --model "xx-name--#" video_in.mp4 video_out.mov
+ROBOFLOW_KEY=xxxxx ./infer.sh "xx-name--#" video_in.mp4 video_out.mov
 ```
 
 To obtain your `ROBOFLOW_KEY`, go to
@@ -60,16 +60,16 @@ The [`infer.sh`](infer.sh) script accepts the following parameters:
 
 | Parameter       | Example                          | Description
 |    ---          |   ---                            |     ---
-| `--model`       | `--model xx-mymodel--1`          | The Roboflow model to use for inference (required).
 | `--base`        | `--base "http://localhost:9001"` | The Roboflow Infer host; set for [On-Device Inference](https://docs.roboflow.com/inference/nvidia-jetson) (default: `https://infer.roboflow.com`).
 | `--confidence`  | `--confidence 50`                | The minimum threshold for the model to output box predictions (default: `50`).
 | `--overlap`     | `--overlap 50`                   | The maximum amount two predicted boxes of the same class can intersect before being combined (default: `50`).
 | `--stroke`      | `--stroke 5`                     | The thickness of the predicted bounding boxes (default: `5`).
-| `--labels`      | `--labels on`                    | Whether to print the class names (default: `off`)
-| `--fps`         | `--fps 6`                        | The number of frames per second (2 means sample 1 frame per second of video_in) (default: fps of `video_in`).
+| `--labels`      | `--labels`                       | Enable printing the class names (implicit default: off)
+| `--fps`         | `--fps 6`                        | The number of frames per second (2 means sample 1 frame per second of video_in) (default: 12).
 | `--tmp`         | `--tmp .`                        | The `tmp` directory; must be writable (default: `/tmp`).
 | `--retries`     | `--retries 3`                    | The number of times to retry a failed inference (default: `3`).
-| `--concurrency` | `--concurrency 8`                | The number of frames to send to the model in parallel (default: `8`).
+| `--parallel`    | `--parallel 8`                   | The number of concurrent frames to send to the model (default: `8`).
+| model           | `xx-mymodel--1`                  | The Roboflow model to use for inference (required).
 | video_in        | `video_in.mp4`                   | The input video file (required).
 | video_out       | `video_out.mp4`                  | The output video file (required).
 
@@ -83,7 +83,7 @@ To build, clone this repo, [install `argbash`](https://argbash.readthedocs.io/en
 then run the following in the repo's top-level directory:
 
 ```
-argbash source.sh -o infer.sh
+argbash source.m4 -o infer.sh
 ```
 
 You can then use your newly generated [`infer.sh`](infer.sh) as described above.
