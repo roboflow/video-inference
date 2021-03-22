@@ -2,6 +2,8 @@
 Example script to do inference on a video file with
 [Roboflow Infer](https://docs.roboflow.com/inference/hosted-api)
 
+![Example Output](fish.gif)
+
 ## Installation
 
 The shell script you need is [`infer.sh`](infer.sh) in this repo.
