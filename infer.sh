@@ -373,7 +373,7 @@ done
 rm -f $out
 echo "Rendering final video ($out)."
 ffmpeg -i $tmp/roboflow_out/frame%05d.jpg -vf fps=$fps_out $out
-exit 1;
+
 rm -rf $tmp/roboflow_in
 rm -rf $tmp/roboflow_out
 
