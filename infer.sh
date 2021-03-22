@@ -1,15 +1,18 @@
 #!/bin/bash
 
 # Created by argbash-init v2.10.0
-# ARG_OPTIONAL_SINGLE([base],[],[The Roboflow Infer host; set for On-Device Inference],["https://infer.roboflow.com"])
+# ARG_OPTIONAL_SINGLE([host],[],[The Roboflow Infer host; set for On-Device Inference],["https://infer.roboflow.com"])
 # ARG_OPTIONAL_SINGLE([confidence],[c],[The minimum threshold for the model to output box predictions.],[50])
 # ARG_OPTIONAL_SINGLE([overlap],[o],[The maximum amount two predicted boxes of the same class can intersect before being combined.],[50])
 # ARG_OPTIONAL_SINGLE([stroke],[s],[The thickness of the predicted bounding boxes.],[5])
 # ARG_OPTIONAL_BOOLEAN([labels],[l],[Print the class names])
-# ARG_OPTIONAL_SINGLE([fps],[f],[The number of frames per second (2 means sample 1 frame per second of video_in).],[12])
+# ARG_OPTIONAL_SINGLE([fps_in],[],[The sample rate from the input video (in frames per second).],[6])
+# ARG_OPTIONAL_SINGLE([fps_out],[],[The render rate (setting higher than fps_in will give a timelapse effect).],[24])
+# ARG_OPTIONAL_SINGLE([scale],[],[The amount to shrink the video; eg 2 to make video_out width and height 2x smaller than video_in.],[1])
 # ARG_OPTIONAL_SINGLE([tmp],[t],[The tmp directory; must be writable.],["/tmp"])
 # ARG_OPTIONAL_SINGLE([retries],[r],[The number of times to retry a failed inference.],[3])
 # ARG_OPTIONAL_SINGLE([parallel],[p],[The number of concurrent frames to send to the model.],[8])
+# ARG_OPTIONAL_BOOLEAN([verbose],[v],[Print debugging information.])
 # ARG_POSITIONAL_SINGLE([model],[The Roboflow model to use for inference (required).])
 # ARG_POSITIONAL_SINGLE([video_in],[The input video file (required).])
 # ARG_POSITIONAL_SINGLE([video_out],[The output video file (required).])
@@ -33,7 +36,7 @@ die()
 
 begins_with_short_option()
 {
-	local first_option all_short_options='coslftrph'
+	local first_option all_short_options='cosltrpvh'
 	first_option="${1:0:1}"
 	test "$all_short_options" = "${all_short_options/$first_option/}" && return 1 || return 0
 }
@@ -44,33 +47,39 @@ _arg_model=
 _arg_video_in=
 _arg_video_out=
 # THE DEFAULTS INITIALIZATION - OPTIONALS
-_arg_base="https://infer.roboflow.com"
+_arg_host="https://infer.roboflow.com"
 _arg_confidence="50"
 _arg_overlap="50"
 _arg_stroke="5"
 _arg_labels="off"
-_arg_fps="12"
+_arg_fps_in="6"
+_arg_fps_out="24"
+_arg_scale="1"
 _arg_tmp="/tmp"
 _arg_retries="3"
 _arg_parallel="8"
+_arg_verbose="off"
 
 
 print_help()
 {
 	printf '%s\n' "<Use a Roboflow Trained model to make predictions on a video.>"
-	printf 'Usage: %s [--base <arg>] [-c|--confidence <arg>] [-o|--overlap <arg>] [-s|--stroke <arg>] [-l|--(no-)labels] [-f|--fps <arg>] [-t|--tmp <arg>] [-r|--retries <arg>] [-p|--parallel <arg>] [-h|--help] <model> <video_in> <video_out>\n' "$0"
+	printf 'Usage: %s [--host <arg>] [-c|--confidence <arg>] [-o|--overlap <arg>] [-s|--stroke <arg>] [-l|--(no-)labels] [--fps_in <arg>] [--fps_out <arg>] [--scale <arg>] [-t|--tmp <arg>] [-r|--retries <arg>] [-p|--parallel <arg>] [-v|--(no-)verbose] [-h|--help] <model> <video_in> <video_out>\n' "$0"
 	printf '\t%s\n' "<model>: The Roboflow model to use for inference (required)."
 	printf '\t%s\n' "<video_in>: The input video file (required)."
 	printf '\t%s\n' "<video_out>: The output video file (required)."
-	printf '\t%s\n' "--base: The Roboflow Infer host; set for On-Device Inference (default: '"https://infer.roboflow.com"')"
+	printf '\t%s\n' "--host: The Roboflow Infer host; set for On-Device Inference (default: '"https://infer.roboflow.com"')"
 	printf '\t%s\n' "-c, --confidence: The minimum threshold for the model to output box predictions. (default: '50')"
 	printf '\t%s\n' "-o, --overlap: The maximum amount two predicted boxes of the same class can intersect before being combined. (default: '50')"
 	printf '\t%s\n' "-s, --stroke: The thickness of the predicted bounding boxes. (default: '5')"
 	printf '\t%s\n' "-l, --labels, --no-labels: Print the class names (off by default)"
-	printf '\t%s\n' "-f, --fps: The number of frames per second (2 means sample 1 frame per second of video_in). (default: '12')"
+	printf '\t%s\n' "--fps_in: The sample rate from the input video (in frames per second). (default: '6')"
+	printf '\t%s\n' "--fps_out: The render rate (setting higher than fps_in will give a timelapse effect). (default: '24')"
+	printf '\t%s\n' "--scale: The amount to shrink the video; eg 2 to make video_out width and height 2x smaller than video_in. (default: '1')"
 	printf '\t%s\n' "-t, --tmp: The tmp directory; must be writable. (default: '"/tmp"')"
 	printf '\t%s\n' "-r, --retries: The number of times to retry a failed inference. (default: '3')"
 	printf '\t%s\n' "-p, --parallel: The number of concurrent frames to send to the model. (default: '8')"
+	printf '\t%s\n' "-v, --verbose, --no-verbose: Print debugging information. (off by default)"
 	printf '\t%s\n' "-h, --help: Prints help"
 }
 
@@ -82,13 +91,13 @@ parse_commandline()
 	do
 		_key="$1"
 		case "$_key" in
-			--base)
+			--host)
 				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-				_arg_base="$2"
+				_arg_host="$2"
 				shift
 				;;
-			--base=*)
-				_arg_base="${_key##--base=}"
+			--host=*)
+				_arg_host="${_key##--host=}"
 				;;
 			-c|--confidence)
 				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
@@ -135,16 +144,29 @@ parse_commandline()
 					{ begins_with_short_option "$_next" && shift && set -- "-l" "-${_next}" "$@"; } || die "The short option '$_key' can't be decomposed to ${_key:0:2} and -${_key:2}, because ${_key:0:2} doesn't accept value and '-${_key:2:1}' doesn't correspond to a short option."
 				fi
 				;;
-			-f|--fps)
+			--fps_in)
 				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-				_arg_fps="$2"
+				_arg_fps_in="$2"
 				shift
 				;;
-			--fps=*)
-				_arg_fps="${_key##--fps=}"
+			--fps_in=*)
+				_arg_fps_in="${_key##--fps_in=}"
 				;;
-			-f*)
-				_arg_fps="${_key##-f}"
+			--fps_out)
+				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+				_arg_fps_out="$2"
+				shift
+				;;
+			--fps_out=*)
+				_arg_fps_out="${_key##--fps_out=}"
+				;;
+			--scale)
+				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+				_arg_scale="$2"
+				shift
+				;;
+			--scale=*)
+				_arg_scale="${_key##--scale=}"
 				;;
 			-t|--tmp)
 				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
@@ -178,6 +200,18 @@ parse_commandline()
 				;;
 			-p*)
 				_arg_parallel="${_key##-p}"
+				;;
+			-v|--no-verbose|--verbose)
+				_arg_verbose="on"
+				test "${1:0:5}" = "--no-" && _arg_verbose="off"
+				;;
+			-v*)
+				_arg_verbose="on"
+				_next="${_key##-v}"
+				if test -n "$_next" -a "$_next" != "$_key"
+				then
+					{ begins_with_short_option "$_next" && shift && set -- "-v" "-${_next}" "$@"; } || die "The short option '$_key' can't be decomposed to ${_key:0:2} and -${_key:2}, because ${_key:0:2} doesn't accept value and '-${_key:2:1}' doesn't correspond to a short option."
+				fi
 				;;
 			-h|--help)
 				print_help
@@ -230,17 +264,117 @@ assign_positional_args 1 "${_positionals[@]}"
 # [ <-- needed because of Argbash
 
 
-printf 'Value of --%s: %s\n' 'base' "$_arg_base"
-printf 'Value of --%s: %s\n' 'confidence' "$_arg_confidence"
-printf 'Value of --%s: %s\n' 'overlap' "$_arg_overlap"
-printf 'Value of --%s: %s\n' 'stroke' "$_arg_stroke"
-printf 'Value of --%s: %s\n' 'labels' "$_arg_labels"
-printf 'Value of --%s: %s\n' 'fps' "$_arg_fps"
-printf 'Value of --%s: %s\n' 'tmp' "$_arg_tmp"
-printf 'Value of --%s: %s\n' 'retries' "$_arg_retries"
-printf 'Value of --%s: %s\n' 'parallel' "$_arg_parallel"
-printf "Value of '%s': %s\\n" 'model' "$_arg_model"
-printf "Value of '%s': %s\\n" 'video_in' "$_arg_video_in"
-printf "Value of '%s': %s\\n" 'video_out' "$_arg_video_out"
+if [ -z "$ROBOFLOW_KEY" ]; then
+    echo "ROBOFLOW_KEY environment variable not found; please set it to your Roboflow API key."
+    exit 1
+fi
+
+verbose=$_arg_verbose
+
+if [ ! -z "$verbose" ]; then
+    printf 'Value of --%s: %s\n' 'host' "$_arg_host"
+    printf 'Value of --%s: %s\n' 'confidence' "$_arg_confidence"
+    printf 'Value of --%s: %s\n' 'overlap' "$_arg_overlap"
+    printf 'Value of --%s: %s\n' 'stroke' "$_arg_stroke"
+    printf 'Value of --%s: %s\n' 'labels' "$_arg_labels"
+    printf 'Value of --%s: %s\n' 'fps_in' "$_arg_fps_in"
+    printf 'Value of --%s: %s\n' 'fps_out' "$_arg_fps_out"
+    printf 'Value of --%s: %s\n' 'scale' "$_arg_scale"
+    printf 'Value of --%s: %s\n' 'tmp' "$_arg_tmp"
+    printf 'Value of --%s: %s\n' 'retries' "$_arg_retries"
+    printf 'Value of --%s: %s\n' 'parallel' "$_arg_parallel"
+    printf 'Value of --%s: %s\n' 'verbose' "$_arg_verbose"
+    printf "Value of '%s': %s\\n" 'model' "$_arg_model"
+    printf "Value of '%s': %s\\n" 'video_in' "$_arg_video_in"
+    printf "Value of '%s': %s\\n" 'video_out' "$_arg_video_out"
+
+    printf "\n"
+fi
+
+in=$_arg_video_in
+out=$_arg_video_out
+tmp=$_arg_tmp
+host=$_arg_host
+model=$_arg_model
+confidence=$_arg_confidence
+overlap=$_arg_overlap
+stroke=$_arg_stroke
+labels=$_arg_labels
+fps_in=$_arg_fps_in
+fps_out=$_arg_fps_out
+scale=$_arg_scale
+
+if [ $in = $out ]; then
+    echo "Cannot overwrite input file. Please make sure video_in and video_out are different."
+    exit 1
+fi
+
+# Check dependencies
+for command in ffmpeg base64 curl
+do
+    command -v $command >/dev/null 2>&1 || { echo -en "\n$command needs to be installed but was not found.";deps=1; }
+done
+[[ $deps -ne 1 ]] || {
+    echo -en "\nError: Install the above dependencies and rerun this script\n";
+    exit 1;
+}
+
+inference_url="$host/$model?access_token=$ROBOFLOW_KEY&format=image&confidence=$confidence&overlap=$overlap&stroke=$stroke"
+if [ $labels = "on" ]; then
+    inference_url="$inference_url&labels=on"
+fi
+
+if [ ! -z "$verbose" ]; then
+    echo "Inference URL: $inference_url"
+fi
+
+if [[ $(curl -s $inference_url | grep -e "not authorized" -e "does not exist") ]]; then
+    echo "Invalid API Key or Model ID.";
+    exit 1;
+fi
+
+mkdir -p $tmp/roboflow_in
+rm -f $tmp/roboflow_in/*
+
+mkdir -p $tmp/roboflow_out
+rm -f $tmp/roboflow_out/*
+
+if [[ $(find "$in" -type f -size +256c 2>/dev/null) ]]; then
+    echo "Splitting input video ($in) into frames... this could take a while for large files."
+else
+    echo "Error: Input file ($in) not found..."
+    exit 1
+fi
+
+ffmpeg -i $in -r $fps_in -vf scale=iw/$scale:ih/$scale $tmp/roboflow_in/frame%05d.jpg
+
+FILES=$tmp/roboflow_in/frame*.jpg
+
+echo "Running inference on $(ls $tmp/roboflow_in | wc -l | xargs) frames..."
+trap 'exit' INT
+for x in {0..$_arg_retries}
+do
+    for f in $FILES
+    do
+        ((i=i%$_arg_parallel)); ((i++==0)) && wait
+        f=$(basename $f)
+        if [[ $(find "$tmp/roboflow_out/$f" -type f -size +256c 2>/dev/null) ]]; then
+            # this inference was already successful; no need to retry.
+            true
+        else
+            if [ ! -z "$verbose" ]; then
+                echo "Running inference on frame $f..."
+            fi
+            cat $tmp/roboflow_in/$f | base64 | curl -s -d @- $inference_url > "$tmp/roboflow_out/$f" &
+        fi
+    done
+done
+
+rm -f $out
+echo "Rendering final video ($out)."
+ffmpeg -i $tmp/roboflow_out/frame%05d.jpg -vf fps=$fps_out $out
+exit 1;
+rm -rf $tmp/roboflow_in
+rm -rf $tmp/roboflow_out
 
 # ] <-- needed because of Argbash

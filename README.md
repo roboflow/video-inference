@@ -14,7 +14,7 @@ To use it
 
 ```
 # Simple usage with ROBOFLOW_KEY env var set inline
-ROBOFLOW_KEY=xxxxx ./infer.sh "xx-name--#" video_in.mp4 video_out.mov
+ROBOFLOW_KEY=xxxxx ./infer.sh xx-name--# video_in.mp4 video_out.mov
 ```
 
 To obtain your `ROBOFLOW_KEY`, go to
@@ -60,12 +60,14 @@ The [`infer.sh`](infer.sh) script accepts the following parameters:
 
 | Parameter       | Example                          | Description
 |    ---          |   ---                            |     ---
-| `--base`        | `--base "http://localhost:9001"` | The Roboflow Infer host; set for [On-Device Inference](https://docs.roboflow.com/inference/nvidia-jetson) (default: `https://infer.roboflow.com`).
+| `--host`        | `--host "http://localhost:9001"` | The Roboflow Infer host; set for [On-Device Inference](https://docs.roboflow.com/inference/nvidia-jetson) (default: `https://infer.roboflow.com`).
 | `--confidence`  | `--confidence 50`                | The minimum threshold for the model to output box predictions (default: `50`).
 | `--overlap`     | `--overlap 50`                   | The maximum amount two predicted boxes of the same class can intersect before being combined (default: `50`).
 | `--stroke`      | `--stroke 5`                     | The thickness of the predicted bounding boxes (default: `5`).
 | `--labels`      | `--labels`                       | Enable printing the class names (implicit default: off)
-| `--fps`         | `--fps 6`                        | The number of frames per second (2 means sample 1 frame per second of video_in) (default: 12).
+| `--fps_in`      | `--fps_in 6`                     | The sample rate from the input video in frames per second (default: 6).
+| `--fps_out`     | `--fps_out 24`                   | The render speed; setting higher than `fps_in` gives a timelapse effect (default: 24).
+| `--scale`       | `--scale 2`                      | The amount to shrink the video; eg 2 to make video_out width and height 2x smaller than video_in (default: 1).
 | `--tmp`         | `--tmp .`                        | The `tmp` directory; must be writable (default: `/tmp`).
 | `--retries`     | `--retries 3`                    | The number of times to retry a failed inference (default: `3`).
 | `--parallel`    | `--parallel 8`                   | The number of concurrent frames to send to the model (default: `8`).
@@ -77,7 +79,7 @@ The [`infer.sh`](infer.sh) script accepts the following parameters:
 
 [The infer script](infer.sh) is built with [`argbash`](https://argbash.io)
 (a code generator that adds smart parameter parsing for bash scripts)
-from [`source.sh`](source.sh).
+from [`source.m4`](source.m4).
 
 To build, clone this repo, [install `argbash`](https://argbash.readthedocs.io/en/stable/install.html),
 then run the following in the repo's top-level directory:
