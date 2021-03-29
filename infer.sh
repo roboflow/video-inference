@@ -1,5 +1,13 @@
 #!/bin/bash
 
+##################################################
+# Roboflow Video Inference Example               #
+# Bash script released under MIT License         #
+# Copyright (c) 2021 Roboflow Inc                #
+#                                                #
+# https://github.com/roboflow-ai/video-inference #
+##################################################
+
 # Created by argbash-init v2.10.0
 # ARG_OPTIONAL_SINGLE([host],[],[The Roboflow Infer host; set for On-Device Inference],["https://infer.roboflow.com"])
 # ARG_OPTIONAL_SINGLE([confidence],[c],[The minimum threshold for the model to output box predictions.],[50])

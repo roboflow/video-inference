@@ -1,5 +1,13 @@
 #!/bin/bash
 
+##################################################
+# Roboflow Video Inference Example               #
+# Bash script released under MIT License         #
+# Copyright (c) 2021 Roboflow Inc                #
+#                                                #
+# https://github.com/roboflow-ai/video-inference #
+##################################################
+
 # m4_ignore(
 echo "This is just a script template, not the script (yet) - pass it to 'argbash' to fix this." >&2
 exit 11  #)Created by argbash-init v2.10.0

@@ -98,3 +98,9 @@ argbash source.m4 -o infer.sh
 ```
 
 You can then use your newly generated [`infer.sh`](infer.sh) as described above.
+
+## License
+
+This example repo is released under an MIT License. You will need to train a model
+with [Roboflow Train](https://docs.roboflow.com/train) which is goverened by
+the [Roboflow Terms of Service](https://roboflow.com/terms).
