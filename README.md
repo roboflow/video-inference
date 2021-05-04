@@ -74,6 +74,7 @@ The [`infer.sh`](infer.sh) script accepts the following parameters:
 | `--overlap`     | `--overlap 50`                   | The maximum amount two predicted boxes of the same class can intersect before being combined (default: `50`).
 | `--stroke`      | `--stroke 5`                     | The thickness of the predicted bounding boxes (default: `5`).
 | `--labels`      | `--labels`                       | Enable printing the class names (implicit default: off)
+| `--classes`     | `--classes car`                  | A comma separated (no whitespace) list of classes to predict (default: show all).
 | `--fps_in`      | `--fps_in 6`                     | The sample rate from the input video in frames per second (default: 6).
 | `--fps_out`     | `--fps_out 24`                   | The render speed; setting higher than `fps_in` gives a timelapse effect (default: 24).
 | `--scale`       | `--scale 2`                      | The amount to shrink the video; eg 2 to make video_out width and height 2x smaller than video_in (default: 1).

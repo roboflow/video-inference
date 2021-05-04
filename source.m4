@@ -22,6 +22,7 @@ exit 11  #)Created by argbash-init v2.10.0
 # ARG_OPTIONAL_SINGLE([tmp], t, [The tmp directory; must be writable.], ["/tmp"])
 # ARG_OPTIONAL_SINGLE([retries], r, [The number of times to retry a failed inference.], [3])
 # ARG_OPTIONAL_SINGLE([parallel], p, [The number of concurrent frames to send to the model.], [8])
+# ARG_OPTIONAL_SINGLE([classes], f, [The classes to show, separated by a comma (no spaces).], [])
 # ARG_OPTIONAL_BOOLEAN([verbose], v, [Print debugging information.])
 # ARG_POSITIONAL_SINGLE([model], [The Roboflow model to use for inference (required).])
 # ARG_POSITIONAL_SINGLE([video_in], [The input video file (required).])
@@ -51,6 +52,7 @@ if [ ! -z "$verbose" ]; then
     printf 'Value of --%s: %s\n' 'tmp' "$_arg_tmp"
     printf 'Value of --%s: %s\n' 'retries' "$_arg_retries"
     printf 'Value of --%s: %s\n' 'parallel' "$_arg_parallel"
+    printf 'Value of --%s: %s\n' 'classes' "$_arg_classes"
     printf 'Value of --%s: %s\n' 'verbose' "$_arg_verbose"
     printf "Value of '%s': %s\\n" 'model' "$_arg_model"
     printf "Value of '%s': %s\\n" 'video_in' "$_arg_video_in"
@@ -68,6 +70,7 @@ confidence=$_arg_confidence
 overlap=$_arg_overlap
 stroke=$_arg_stroke
 labels=$_arg_labels
+classes=$_arg_classes
 fps_in=$_arg_fps_in
 fps_out=$_arg_fps_out
 scale=$_arg_scale
@@ -90,6 +93,10 @@ done
 inference_url="$host/$model?access_token=$ROBOFLOW_KEY&format=image&confidence=$confidence&overlap=$overlap&stroke=$stroke"
 if [ $labels = "on" ]; then
     inference_url="$inference_url&labels=on"
+fi
+
+if [ $classes ]; then
+    inference_url="$inference_url&classes=$classes"
 fi
 
 if [ ! -z "$verbose" ]; then

@@ -20,6 +20,7 @@
 # ARG_OPTIONAL_SINGLE([tmp],[t],[The tmp directory; must be writable.],["/tmp"])
 # ARG_OPTIONAL_SINGLE([retries],[r],[The number of times to retry a failed inference.],[3])
 # ARG_OPTIONAL_SINGLE([parallel],[p],[The number of concurrent frames to send to the model.],[8])
+# ARG_OPTIONAL_SINGLE([classes],[f],[The classes to show, separated by a comma (no spaces).],[])
 # ARG_OPTIONAL_BOOLEAN([verbose],[v],[Print debugging information.])
 # ARG_POSITIONAL_SINGLE([model],[The Roboflow model to use for inference (required).])
 # ARG_POSITIONAL_SINGLE([video_in],[The input video file (required).])
@@ -44,7 +45,7 @@ die()
 
 begins_with_short_option()
 {
-	local first_option all_short_options='cosltrpvh'
+	local first_option all_short_options='cosltrpfvh'
 	first_option="${1:0:1}"
 	test "$all_short_options" = "${all_short_options/$first_option/}" && return 1 || return 0
 }
@@ -66,13 +67,14 @@ _arg_scale="1"
 _arg_tmp="/tmp"
 _arg_retries="3"
 _arg_parallel="8"
+_arg_classes=
 _arg_verbose="off"
 
 
 print_help()
 {
 	printf '%s\n' "<Use a Roboflow Trained model to make predictions on a video.>"
-	printf 'Usage: %s [--host <arg>] [-c|--confidence <arg>] [-o|--overlap <arg>] [-s|--stroke <arg>] [-l|--(no-)labels] [--fps_in <arg>] [--fps_out <arg>] [--scale <arg>] [-t|--tmp <arg>] [-r|--retries <arg>] [-p|--parallel <arg>] [-v|--(no-)verbose] [-h|--help] <model> <video_in> <video_out>\n' "$0"
+	printf 'Usage: %s [--host <arg>] [-c|--confidence <arg>] [-o|--overlap <arg>] [-s|--stroke <arg>] [-l|--(no-)labels] [--fps_in <arg>] [--fps_out <arg>] [--scale <arg>] [-t|--tmp <arg>] [-r|--retries <arg>] [-p|--parallel <arg>] [-f|--classes <arg>] [-v|--(no-)verbose] [-h|--help] <model> <video_in> <video_out>\n' "$0"
 	printf '\t%s\n' "<model>: The Roboflow model to use for inference (required)."
 	printf '\t%s\n' "<video_in>: The input video file (required)."
 	printf '\t%s\n' "<video_out>: The output video file (required)."
@@ -87,6 +89,7 @@ print_help()
 	printf '\t%s\n' "-t, --tmp: The tmp directory; must be writable. (default: '"/tmp"')"
 	printf '\t%s\n' "-r, --retries: The number of times to retry a failed inference. (default: '3')"
 	printf '\t%s\n' "-p, --parallel: The number of concurrent frames to send to the model. (default: '8')"
+	printf '\t%s\n' "-f, --classes: The classes to show, separated by a comma (no spaces). (no default)"
 	printf '\t%s\n' "-v, --verbose, --no-verbose: Print debugging information. (off by default)"
 	printf '\t%s\n' "-h, --help: Prints help"
 }
@@ -209,6 +212,17 @@ parse_commandline()
 			-p*)
 				_arg_parallel="${_key##-p}"
 				;;
+			-f|--classes)
+				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+				_arg_classes="$2"
+				shift
+				;;
+			--classes=*)
+				_arg_classes="${_key##--classes=}"
+				;;
+			-f*)
+				_arg_classes="${_key##-f}"
+				;;
 			-v|--no-verbose|--verbose)
 				_arg_verbose="on"
 				test "${1:0:5}" = "--no-" && _arg_verbose="off"
@@ -291,6 +305,7 @@ if [ ! -z "$verbose" ]; then
     printf 'Value of --%s: %s\n' 'tmp' "$_arg_tmp"
     printf 'Value of --%s: %s\n' 'retries' "$_arg_retries"
     printf 'Value of --%s: %s\n' 'parallel' "$_arg_parallel"
+    printf 'Value of --%s: %s\n' 'classes' "$_arg_classes"
     printf 'Value of --%s: %s\n' 'verbose' "$_arg_verbose"
     printf "Value of '%s': %s\\n" 'model' "$_arg_model"
     printf "Value of '%s': %s\\n" 'video_in' "$_arg_video_in"
@@ -308,6 +323,7 @@ confidence=$_arg_confidence
 overlap=$_arg_overlap
 stroke=$_arg_stroke
 labels=$_arg_labels
+classes=$_arg_classes
 fps_in=$_arg_fps_in
 fps_out=$_arg_fps_out
 scale=$_arg_scale
@@ -330,6 +346,10 @@ done
 inference_url="$host/$model?access_token=$ROBOFLOW_KEY&format=image&confidence=$confidence&overlap=$overlap&stroke=$stroke"
 if [ $labels = "on" ]; then
     inference_url="$inference_url&labels=on"
+fi
+
+if [ $classes ]; then
+    inference_url="$inference_url&classes=$classes"
 fi
 
 if [ ! -z "$verbose" ]; then
