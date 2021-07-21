@@ -56,7 +56,7 @@ _arg_model=
 _arg_video_in=
 _arg_video_out=
 # THE DEFAULTS INITIALIZATION - OPTIONALS
-_arg_host="https://infer.roboflow.com"
+_arg_host="https://detect.roboflow.com"
 _arg_confidence="50"
 _arg_overlap="50"
 _arg_stroke="5"
@@ -343,7 +343,7 @@ done
     exit 1;
 }
 
-inference_url="$host/$model?access_token=$ROBOFLOW_KEY&format=image&confidence=$confidence&overlap=$overlap&stroke=$stroke"
+inference_url="$host/$model?api_key=$ROBOFLOW_KEY&format=image&confidence=$confidence&overlap=$overlap&stroke=$stroke"
 if [ $labels = "on" ]; then
     inference_url="$inference_url&labels=on"
 fi

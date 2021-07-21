@@ -8,7 +8,7 @@ An example video (gif) generated with this utility script from a Roboflow model
 with the following command:
 
 ```
-ROBOFLOW_KEY=xxxxxxxx ./infer.sh rf-aquarium-merged--3 IMG_3203.mov fish.gif --fps_in 3 --fps_out 12 --scale 4
+ROBOFLOW_KEY=xxxxxxxx ./infer.sh rf-aquarium-merged/3 IMG_3203.mov fish.gif --fps_in 3 --fps_out 12 --scale 4
 ```
 
 ## Installation
@@ -23,7 +23,7 @@ To use it
 
 ```
 # Simple usage with ROBOFLOW_KEY env var set inline
-ROBOFLOW_KEY=xxxxx ./infer.sh xx-name--# video_in.mp4 video_out.mov
+ROBOFLOW_KEY=xxxxx ./infer.sh [YOUR_DATASET]/[YOUR_VERSION] video_in.mp4 video_out.mov
 ```
 
 To obtain your `ROBOFLOW_KEY`, go to
@@ -31,7 +31,7 @@ To obtain your `ROBOFLOW_KEY`, go to
 your `API Key` (*not* your `Publishable Key`). Treat this API Key like a password;
 it gives access to your Roboflow account and is meant to remain a secret.
 
-The model ID (`xx-name--#` in the command above) is obtained from the Roboflow
+The model ID (`[YOUR_DATASET]/[YOUR_VERSION]` in the command above) is obtained from the Roboflow
 UI after training. Click "Example Web App" in the "Use Your Trained Model" section
 and copy it from the pre-filled text field at the top of the page.
 
