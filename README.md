@@ -10,6 +10,11 @@ with the following command:
 ```
 ROBOFLOW_KEY=xxxxxxxx ./infer.sh rf-aquarium-merged/3 IMG_3203.mov fish.gif --fps_in 3 --fps_out 12 --scale 4
 ```
+## Getting Started
+
+Colab Tutorial Here:
+
+<a href="https://colab.research.google.com/drive/1XiC6vihCXzCeCpwk9vVi38l4cIIVdwCx?usp=sharing"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a>
 
 ## Installation
 
