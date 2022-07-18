@@ -18,6 +18,7 @@ confidence = 0.2
 overlap = 0.5
 #frame_limit = 500
 
+
 ###CAPTURE VIDEO###
 cap = cv2.VideoCapture(video_file)
 fps = cap.get(cv2.CAP_PROP_FPS)
@@ -62,10 +63,7 @@ while ret:
         "&confidence=",
         str(confidence),
         "&overlap=",
-        str(overlap),
-        "&name=",
-        str(frame_num),
-        ".jpg"
+        str(overlap)
     ])
 
     # POST to the API
