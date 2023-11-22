@@ -1,4 +1,6 @@
-**_Note: Update from November 2023 - Roboflow now provides a [new video inference API](https://blog.roboflow.com/roboflow-video-inference-api/), please visit this link to learn more._**
+**_Note: Update from November 2023 - Roboflow now provides a [new video inference API](https://blog.roboflow.com/roboflow-video-inference-api/), please visit this link to learn more. This repository is archived._**
+
+
 
 # Roboflow Video Inference
 Example script to do inference on a video file with
@@ -114,5 +116,5 @@ with [Roboflow Train](https://docs.roboflow.com/train) which is goverened by
 the [Roboflow Terms of Service](https://roboflow.com/terms).
 
 
-**_Note: Update from November 2023 - Roboflow now provides a [new video inference API](https://blog.roboflow.com/roboflow-video-inference-api/), please visit this link to learn more._
+**_Note: Update from November 2023 - Roboflow now provides a [new video inference API](https://blog.roboflow.com/roboflow-video-inference-api/), please visit this link to learn more. This repository is archived._
 **
