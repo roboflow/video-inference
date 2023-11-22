@@ -1,3 +1,5 @@
+**_Note: Update from November 2023 - Roboflow now provides a [new video inference API](https://blog.roboflow.com/roboflow-video-inference-api/), please visit this link to learn more._**
+
 # Roboflow Video Inference
 Example script to do inference on a video file with
 [Roboflow Infer](https://docs.roboflow.com/inference/hosted-api)
@@ -110,3 +112,7 @@ You can then use your newly generated [`infer.sh`](infer.sh) as described above.
 This example repo is released under an MIT License. You will need to train a model
 with [Roboflow Train](https://docs.roboflow.com/train) which is goverened by
 the [Roboflow Terms of Service](https://roboflow.com/terms).
+
+
+**_Note: Update from November 2023 - Roboflow now provides a [new video inference API](https://blog.roboflow.com/roboflow-video-inference-api/), please visit this link to learn more._
+**
