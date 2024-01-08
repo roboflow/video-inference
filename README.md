@@ -1,4 +1,7 @@
-**_Note: Update from November 2023 - Roboflow now provides a [new video inference API](https://blog.roboflow.com/roboflow-video-inference-api/), please visit this link to learn more. This repository is archived._**
+# 🚨🚨🚨 REPO DEPRECATED 🚨🚨🚨
+
+* For Realtime Video (or webcam): use [Roboflow `inference`](https://inference.roboflow.com); docs for [realtime video streaming are available here](https://inference.roboflow.com/quickstart/run_model_on_rtsp_webcam/).
+* For Async/Recorded Video: Roboflow now provides a [new video inference API](https://blog.roboflow.com/roboflow-video-inference-api/), please visit [the Hosted Video Inference docs](https://docs.roboflow.com/deploy/video-inference) to learn more.
 
 
 
