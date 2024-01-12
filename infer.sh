@@ -356,7 +356,7 @@ if [ ! -z "$verbose" ]; then
     echo "Inference URL: $inference_url"
 fi
 
-if [[ $(curl -s $inference_url | grep -e "not authorized" -e "does not exist") ]]; then
+if [[ $(curl -s $inference_url | grep -e "Forbidden" -e "Not Found") ]]; then
     echo "Invalid API Key or Model ID.";
     exit 1;
 fi
